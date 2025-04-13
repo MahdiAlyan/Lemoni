@@ -1,4 +1,6 @@
 import os
+from builtins import object
+
 from django.db import models
 from PIL import Image
 import cv2
@@ -12,8 +14,7 @@ class Images(models.Model):
     processed = models.BooleanField(default=False)
     result = models.BooleanField(default=False)
     description = models.TextField(default='')
-    size = models.IntegerField(default=os.path.getsize(image_file.url))
-    resolution = models.IntegerField(default=Image.open(image_file.url).size)
+
     # Capture metadata extracted from the image (often available in EXIF/XMP data)
     capture_date = models.DateTimeField(null=True, blank=True)  # When the image was actually captured
     gps_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
@@ -38,3 +39,11 @@ class Images(models.Model):
         if self.gps_latitude is not None and self.gps_longitude is not None:
             return f" Lat: {self.gps_latitude}, Lng: {self.gps_longitude}, Alt: {self.gps_altitude}"
         return "Location not available"
+
+    def size(self):
+        return os.path.getsize(self.image_file.path)
+
+    def resolution(self):
+        image = cv2.imread(self.image_file.path)
+        height, width = image.shape[:2]
+        return f" {width} x {height}"

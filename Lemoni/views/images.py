@@ -6,11 +6,15 @@ from django.shortcuts import render
 
 
 def images_dashboard(request):
-    images = Images.objects.all().order_by('-uploaded_at')
-    paginator = Paginator(images, 10)
+    paginator = Paginator(all_images(), 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'Images/media_dashboard.html', {'page_obj': page_obj})
+
+
+def all_images():
+    images = Images.objects.all().order_by('-uploaded_at')
+    return images
 
 
 def images_data(request):
@@ -18,8 +22,7 @@ def images_data(request):
     page_index = request.GET.get('')
     page_size = request.GET.get('')
 
-    images_list = Images.objects.all().order_by('-uploaded_at')
-
+    images_list = all_images()
     records_total = images_list.count()
 
     images_dtos = []
@@ -28,6 +31,7 @@ def images_data(request):
             {
                 'id': image_obj.id,
                 'description': image_obj.description,
+
             }
         )
 
