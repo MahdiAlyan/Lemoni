@@ -1,0 +1,5 @@
+django
+mysqlclient
+opencv-python
+ipython
+Pillow

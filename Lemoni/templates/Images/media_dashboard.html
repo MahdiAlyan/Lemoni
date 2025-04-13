@@ -1,0 +1,101 @@
+{% extends 'main/base.html' %}
+{% block title %}Images Dashboard{% endblock %}
+{% block content %}
+    <h1 class="h3 mb-4 text-gray-800">Welcome to Images Dashboard</h1>
+    <button  onclick="AddImageForm()" id="toggleButton" class="btn btn-primary btn-sm">Open Media</button>
+    <br>
+    <br>
+    <form action="{% url 'upload_images' %}" method="post" enctype="multipart/form-data" class="dropzone" id="my-dropzone" action="/Images/Upload/" style="display: none">
+        {% csrf_token %}
+    </form>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>ID</th>
+                        <th>Uploaded Date</th>
+                        <th>Processed</th>
+                        <th>Result</th>
+                        <th>Description</th>
+                        <th>Path</th>
+                        <th>Capture Date</th>
+                        <th>Location</th>
+                        <th>Resolution</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% for image in page_obj %}
+                    <tr>
+                        <td><img src="{{  image.image_file.url }}" alt="Image" width="50"></td>
+                        <td>{{ image.id }}</td>
+                        <td>{{ image.uploaded_at }}</td>
+                        <td>{{ image.processed }}</td>
+                        <td>{{ image.result }}</td>
+                        <td>{{ image.description }}</td>
+                        <td>{{ image.image_file.url }}</td>
+                        <td>{{ image.capture_date }}</td>
+                        <td>{{ image.location }}</td>
+                        <td>{{ image.resolution }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9">No data available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% include 'main/../main/paginator.html' %}
+    <!-- Page level plugins -->
+    <script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="/js/demo/datatables-demo.js"></script>
+<script>
+
+// Disable autoDiscover to prevent Dropzone from automatically attaching to elements
+Dropzone.autoDiscover = true;
+
+// Initialize Dropzone on the form with ID 'my-dropzone'
+var myDropzone = new Dropzone("#my-dropzone", {
+  paramName: "file", // The name that will be used to transfer the file
+  maxFilesize: 10, // Maximum file size in MB
+  acceptedFiles: "image/*", // Accept only images
+  addRemoveLinks: true, // Show remove links on each file upload
+  dictDefaultMessage: "Drop files here or click to upload", // Default message displayed in the dropzone area
+  init: function() {
+    this.on("success", function(file, response) {
+      console.log("File uploaded successfully");
+      window.refresh();
+    });
+    this.on("error", function(file, errorMessage) {
+      console.log("Error uploading file: " + errorMessage);
+    });
+  }
+});
+
+function AddImageForm(){
+
+    let dropzone = document.getElementById("my-dropzone");
+    let toggleButton = document.getElementById("toggleButton");
+
+    if (dropzone.style.display === 'none' || dropzone.style.display === ''){
+        dropzone.style.display = "block";
+        toggleButton.innerHTML  = "Close Media"
+    }
+    else {
+        dropzone.style.display = "none";
+        toggleButton.innerHTML  = "Open Media"
+    }
+
+}
+
+</script>
+{% endblock %}
