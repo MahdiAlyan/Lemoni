@@ -8,9 +8,10 @@
     <link rel="icon" href="{% static 'img/icon.png' %}">
     
     <!-- CSS Files -->
+    <link href="{% static 'vendor/datatables/datatables.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/datatables/datatables.min.css' %}" rel="stylesheet">
     <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
 
 </head>
 <body id="page-top">
@@ -36,7 +37,10 @@
     <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/datatables.js' %}"></script>
+    <script src="{% static 'vendor/datatables/datatables.min.js' %}"></script>
+    <script src="{% static 'vendor/jquery/jquery.slim.js' %}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
-
+    {% block script %} {% endblock %}
 </body>
 </html>

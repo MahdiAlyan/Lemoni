@@ -6,45 +6,44 @@ from django.shortcuts import render
 
 
 def images_dashboard(request):
-    paginator = Paginator(all_images(), 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request, 'Images/media_dashboard.html', {'page_obj': page_obj})
-
-
-def all_images():
-    images = Images.objects.all().order_by('-uploaded_at')
-    return images
+    return render(request, 'images/media_dashboard.html')
 
 
 def images_data(request):
-    # parse parameters from request
-    page_index = request.GET.get('')
-    page_size = request.GET.get('')
+    draw = int(request.GET.get('draw', 1))
+    start = int(request.GET.get('start', 0))
+    length = int(request.GET.get('length', 10))
+    search_value = request.GET.get('search[value]', '')
 
-    images_list = all_images()
-    records_total = images_list.count()
+    images = Images.objects.all()
 
-    images_dtos = []
-    for image_obj in images_list:
-        images_dtos.append(
-            {
-                'id': image_obj.id,
-                'description': image_obj.description,
+    if search_value:
+        images = images.filter(description__icontains=search_value)
 
-            }
-        )
+    total = images.count()
+    images = images[start:start+length]
 
-    data = {
-        {
-            "draw": 1,
-            "recordsTotal": records_total,
-            "recordsFiltered": records_total,
-            "data": images_dtos
-        }
-    }
+    data = []
+    for image in images:
+        data.append({
+            'image': f'<img src="{image.image_file.url}" width="50">',
+            'id': image.id,
+            'uploaded_at': image.uploaded_at.strftime('%Y-%m-%d %H:%M'),
+            'processed': str(image.processed),
+            'result': image.result,
+            'description': image.description,
+            'path': image.image_file.url,
+            'capture_date': image.capture_date.strftime('%Y-%m-%d') if image.capture_date else '',
+            'location': image.location,
+            'resolution': image.resolution,
+        })
 
-    return JsonResponse(data)
+    return JsonResponse({
+        'draw': draw,
+        'recordsTotal': Images.objects.count(),
+        'recordsFiltered': total,
+        'data': data
+    })
 
 
 def upload_images(request):

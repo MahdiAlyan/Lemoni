@@ -11,7 +11,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>Image</th>
@@ -26,76 +26,51 @@
                         <th>Resolution</th>
                     </tr>
                 </thead>
-                
-                <tbody>
-                    {% for image in page_obj %}
-                    <tr>
-                        <td><img src="{{  image.image_file.url }}" alt="Image" width="50"></td>
-                        <td>{{ image.id }}</td>
-                        <td>{{ image.uploaded_at }}</td>
-                        <td>{{ image.processed }}</td>
-                        <td>{{ image.result }}</td>
-                        <td>{{ image.description }}</td>
-                        <td>{{ image.image_file.url }}</td>
-                        <td>{{ image.capture_date }}</td>
-                        <td>{{ image.location }}</td>
-                        <td>{{ image.resolution }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="9">No data available</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
             </table>
         </div>
     </div>
 
-{% include 'main/../main/paginator.html' %}
-    <!-- Page level plugins -->
-    <script src="/vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+{% block script %}
+    <script language="javascript">
 
-    <!-- Page level custom scripts -->
-    <script src="/js/demo/datatables-demo.js"></script>
-<script>
+        
+        
+        Dropzone.autoDiscover = true;
+        let myDropzone = new Dropzone("#my-dropzone", {
+            paramName: "file", 
+            maxFilesize: 10, // 
+            acceptedFiles: "image/*", 
+            addRemoveLinks: true, 
+            dictDefaultMessage: "Drop files here or click to upload", 
+            init: function() {
+            this.on("success", function(file, response) {
+              console.log("File uploaded successfully");
+              window.refresh();
+            });
+            this.on("error", function(file, errorMessage) {
+              console.log("Error uploading file: " + errorMessage);
+            });
+            }
+        });
+        
+        
+        
+        
+        function AddImageForm(){
+            let dropzone = document.getElementById("my-dropzone");
+            let toggleButton = document.getElementById("toggleButton");
+            if (dropzone.style.display === 'none'){
+                dropzone.style.display = "block";
+                toggleButton.innerHTML  = "Close Media"
+            }
+            else {
+                dropzone.style.display = "none";
+                toggleButton.innerHTML  = "Open Media"
+            }
+        }
+        
+    </script>
 
-// Disable autoDiscover to prevent Dropzone from automatically attaching to elements
-Dropzone.autoDiscover = true;
+{% endblock %}
 
-// Initialize Dropzone on the form with ID 'my-dropzone'
-var myDropzone = new Dropzone("#my-dropzone", {
-  paramName: "file", // The name that will be used to transfer the file
-  maxFilesize: 10, // Maximum file size in MB
-  acceptedFiles: "image/*", // Accept only images
-  addRemoveLinks: true, // Show remove links on each file upload
-  dictDefaultMessage: "Drop files here or click to upload", // Default message displayed in the dropzone area
-  init: function() {
-    this.on("success", function(file, response) {
-      console.log("File uploaded successfully");
-      window.refresh();
-    });
-    this.on("error", function(file, errorMessage) {
-      console.log("Error uploading file: " + errorMessage);
-    });
-  }
-});
-
-function AddImageForm(){
-
-    let dropzone = document.getElementById("my-dropzone");
-    let toggleButton = document.getElementById("toggleButton");
-
-    if (dropzone.style.display === 'none' || dropzone.style.display === ''){
-        dropzone.style.display = "block";
-        toggleButton.innerHTML  = "Close Media"
-    }
-    else {
-        dropzone.style.display = "none";
-        toggleButton.innerHTML  = "Open Media"
-    }
-
-}
-
-</script>
 {% endblock %}
