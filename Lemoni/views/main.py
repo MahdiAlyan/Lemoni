@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 def home(request):
-    return render(request, 'main/home.html')
+    return render(request, 'main/dashboard.html')
 
 
 def about(request):
@@ -18,7 +18,7 @@ def dashboard(request):
 
 
 urlpatterns = [
-    path('home/', home, name='home'),
+    path('home/', home, name='dashboard'),
     path('about/', about, name='about'),
     path('dashoard/', dashboard, name='dashboard'),
 ]

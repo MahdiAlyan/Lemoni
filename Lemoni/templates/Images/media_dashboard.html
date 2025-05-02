@@ -1,17 +1,29 @@
 {% extends 'main/base.html' %}
+
 {% block title %}Images Dashboard{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/basic.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+{% endblock %}
+
 {% block content %}
     <h1 class="h3 mb-4 text-gray-800">Welcome to Images Dashboard</h1>
-    <button  onclick="AddImageForm()" id="toggleButton" class="btn btn-primary btn-sm">Open Media</button>
-    <br>
-    <br>
-    <form action="{% url 'upload_images' %}" method="post" enctype="multipart/form-data" class="dropzone" id="my-dropzone" action="/Images/Upload/" style="display: none">
-        {% csrf_token %}
+    <button onclick="AddImageForm()" id="toggleButton" class="btn btn-primary btn-sm">Open Media</button>
+
+    <br><br>
+
+    <form action="{% url 'upload_images' %}" class="dropzone dz-clickable" id="my-dropzone" style="display: none" enctype="multipart/form-data">
+        <div class="dz-message d-flex flex-column">
+            <i class="material-icons text-muted">cloud_upload</i>
+            Drag &amp; Drop here or click to upload
+        </div>
     </form>
 
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>Image</th>
@@ -30,47 +42,77 @@
         </div>
     </div>
 
-{% block script %}
-    <script language="javascript">
-
-        
-        
-        Dropzone.autoDiscover = true;
-        let myDropzone = new Dropzone("#my-dropzone", {
-            paramName: "file", 
-            maxFilesize: 10, // 
-            acceptedFiles: "image/*", 
-            addRemoveLinks: true, 
-            dictDefaultMessage: "Drop files here or click to upload", 
-            init: function() {
-            this.on("success", function(file, response) {
-              console.log("File uploaded successfully");
-              window.refresh();
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').dataTable({
+                ajax: '{% url "images_data" %}',
+                processing: true,
+                serverSide: false,
+                autoWidth: true,
+                columns: [
+                    { 
+                        'data': 'image_file',
+                        'render': function(data, type, row) {
+                            return `<img src="${data}" alt="Image" style="width: 50px; height: auto;">`;
+                        }
+                    },
+                    { 'data': 'id' },
+                    { 'data': 'uploaded_at' },
+                    { 'data': 'processed' },
+                    { 'data': 'result' },
+                    { 'data': 'description' },
+                    { 'data': 'path' },
+                    { 'data': 'capture_date' },
+                    { 'data': 'location' },
+                    { 'data': 'resolution' }
+                ]
             });
-            this.on("error", function(file, errorMessage) {
-              console.log("Error uploading file: " + errorMessage);
-            });
-            }
         });
-        
-        
-        
-        
-        function AddImageForm(){
+
+        function AddImageForm() {
             let dropzone = document.getElementById("my-dropzone");
             let toggleButton = document.getElementById("toggleButton");
-            if (dropzone.style.display === 'none'){
+            if (dropzone.style.display === 'none') {
                 dropzone.style.display = "block";
-                toggleButton.innerHTML  = "Close Media"
-            }
-            else {
+                toggleButton.innerHTML = "Close Media";
+            } else {
                 dropzone.style.display = "none";
-                toggleButton.innerHTML  = "Open Media"
+                toggleButton.innerHTML = "Open Media";
             }
         }
-        
+
+        Dropzone.autoDiscover = false; // Disable auto-discovery to avoid conflicts
+        let uploadedFilesCount = 0; // Track the number of uploaded files
+        let totalFiles = 0; // Track the total number of files to upload
+
+        let myDropzone = new Dropzone("#my-dropzone", {
+            url: "{% url 'upload_images' %}", // URL for handling uploads
+            paramName: "file", // Name of the file parameter
+            maxFilesize: 10, // Maximum file size in MB
+            acceptedFiles: "image/*", // Accept only image files
+            addRemoveLinks: true, // Allow users to remove files
+            dictDefaultMessage: "Drop files here or click to upload", // Default message
+            init: function() {
+                this.on("addedfile", function() {
+                    totalFiles++; // Increment total files count
+                });
+
+                this.on("success", function(file, response) {
+                    uploadedFilesCount++; // Increment uploaded files count
+                    console.log(`File uploaded successfully: ${file.name}`);
+                });
+
+                this.on("queuecomplete", function() {
+                    // Display a single message after all files are uploaded
+                    alert(`${uploadedFilesCount} out of ${totalFiles} files uploaded successfully!`);
+                    uploadedFilesCount = 0; // Reset counters
+                    totalFiles = 0;
+                });
+
+                this.on("removedfile", function(file) {
+                    console.log(`File removed: ${file.name}`);
+                });
+            }
+        });
     </script>
-
-{% endblock %}
-
 {% endblock %}

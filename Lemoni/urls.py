@@ -25,6 +25,5 @@ from Lemoni.views import main, images
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('', include(main.urlpatterns)),
-                  path('images/', include(images.urlpatterns)),
-
+                  path('images/', include(images.urlpatterns)), 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
